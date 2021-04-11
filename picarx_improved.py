@@ -12,11 +12,11 @@ except ImportError:
 from math import tan
 import logging
 from logdecorator import log_on_start, log_on_end, log_on_error
-# logging_format = "%(asctime)s: %(message)s"
-# logging.basicConfig(format=logging_format, level=logging.INFO,
-#                     datefmt="%H:%M:%S")
+logging_format = "%(asctime)s: %(message)s"
+logging.basicConfig(format=logging_format, level=logging.INFO,
+                    datefmt="%H:%M:%S")
 # # Comment this line out to disable logging!
-# logging.getLogger().setLevel(logging.DEBUG)
+logging.getLogger().setLevel(logging.DEBUG)
 # logging.debug("This is how you should print!")
 
 PERIOD = 4095
