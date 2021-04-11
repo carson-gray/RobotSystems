@@ -30,8 +30,8 @@ left_rear_pwm_pin = PWM("P13")
 right_rear_pwm_pin = PWM("P12")
 left_rear_dir_pin = Pin("D4")
 right_rear_dir_pin = Pin("D5")
-car_len = 3
-wheel_base = 4
+car_len = 3.6
+wheel_base = 4.4
 
 S0 = ADC('A0')
 S1 = ADC('A1')
@@ -188,18 +188,16 @@ def backward(speed):
 def forward(speed):
     global dir_cal_value, steering_angle, car_len, wheel_base
     if steering_angle != 0:
+        # (-) t_r if left, (+) t_r if right
         turning_radius = car_len / tan(steering_angle)
-        outer_radius = turning_radius + wheel_base / 2
-        inner_radius = turning_radius - wheel_base / 2
-        outer_ratio = outer_radius / turning_radius
-        inner_ratio = inner_radius / turning_radius
-
-        if steering_angle > 0:
-            set_motor_speed(1, -1 * outer_ratio * speed)
-            set_motor_speed(2, -1 * inner_ratio * speed)
-        elif steering_angle < 0:
-            set_motor_speed(1, -1 * inner_ratio * speed)
-            set_motor_speed(2, -1 * outer_ratio * speed)
+        # adjustments are correct for either turning direction
+        right_radius = turning_radius - wheel_base / 2
+        left_radius = turning_radius + wheel_base / 2
+        # ratio relative to center of wheel_base
+        right_ratio = abs(right_radius / turning_radius)
+        left_ratio = abs(left_radius / turning_radius)
+        set_motor_speed(1, -1 * left_ratio * speed)
+        set_motor_speed(2, -1 * right_ratio * speed)
     else:
         set_motor_speed(1, -1 * speed)
         set_motor_speed(2, -1 * speed)
