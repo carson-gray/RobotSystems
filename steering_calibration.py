@@ -9,7 +9,9 @@ __reset_mcu__()
 time.sleep(0.01)
 
 car.set_dir_servo_angle(0)
+time.sleep(0.5)
 car.forward(75)
 time.sleep(3)
+
 #car.dir_servo_angle_calibration()
 
