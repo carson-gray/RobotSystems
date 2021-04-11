@@ -1,6 +1,7 @@
 import time
 try:
     from ezblock import *
+    print("test")
     __reset_mcu__()
     time.sleep(0.01)
 except ImportError:
