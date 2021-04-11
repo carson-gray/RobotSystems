@@ -114,11 +114,12 @@ def dir_servo_angle_calibration(value):
 
 @log_on_start(logging.DEBUG, "Message when function starts")
 @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
-@log_on_end(logging.DEBUG, f"{steering_angle}")
+@log_on_end(logging.DEBUG, "{result!r}")
 def set_dir_servo_angle(value):
     global dir_cal_value, steering_angle
     dir_servo_pin.angle(value + dir_cal_value)
     steering_angle = value
+    return steering_angle
 
 
 @log_on_start(logging.DEBUG, "Message when function starts")
