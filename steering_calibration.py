@@ -10,16 +10,14 @@ time.sleep(0.01)
 
 car.set_dir_servo_angle(0)
 time.sleep(0.1)
-car.forward(60)
-time.sleep(2)
-
+car.forward(40)
+time.sleep(1)
 car.set_dir_servo_angle(7)
-car.forward(60)
-time.sleep(1)
-
+time.sleep(2)
+car.set_dir_servo_angle(0)
+time.sleep(2)
 car.set_dir_servo_angle(-7)
-car.forward(60)
-time.sleep(1)
+time.sleep(2)
 
 #car.dir_servo_angle_calibration()
 
