@@ -47,6 +47,8 @@ cali_dir_value = [1, -1]
 cali_speed_value = [0, 0]
 steering_angle = 0
 
+out_vals = []
+
 for pin in motor_speed_pins:
     pin.period(PERIOD)
     pin.prescaler(PRESCALER)
@@ -184,9 +186,9 @@ def backward(speed):
 
 @log_on_start(logging.DEBUG, "Message when function starts")
 @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
-@log_on_end(logging.DEBUG, "Message when function ends successfully")
+@log_on_end(logging.DEBUG, f"{out_vals}")
 def forward(speed):
-    global dir_cal_value, steering_angle, car_len, wheel_base
+    global dir_cal_value, steering_angle, car_len, wheel_base, out_vals
     if steering_angle != 0:
         # (-) t_r if left, (+) t_r if right
         turning_radius = car_len / tan(steering_angle)
@@ -196,6 +198,7 @@ def forward(speed):
         # ratio relative to center of wheel_base
         right_ratio = right_radius / turning_radius
         left_ratio = left_radius / turning_radius
+        out_vals = [left_ratio, right_ratio]
         set_motor_speed(1, -1 * left_ratio * speed)
         set_motor_speed(2, -1 * right_ratio * speed)
     else:
