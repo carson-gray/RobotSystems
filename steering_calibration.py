@@ -1,9 +1,10 @@
-import picarx_improved as car
-from ezblock import __reset_mcu__
 import time
-
+from ezblock import __reset_mcu__
 __reset_mcu__()
 time.sleep(0.01)
+
+import picarx_improved as car
+
 
 car.forward(75)
 time.sleep(10)
