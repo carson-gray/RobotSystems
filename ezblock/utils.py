@@ -11,8 +11,8 @@ ble = BLE()
 
 #__PRINT__ = print
 
-def print(msg, end='\n', tag='[DEBUG]'):
-    pass
+#def print(msg, end='\n', tag='[DEBUG]'):
+    #pass
     # _msg = "Ezblock [{}] [DEBUG] {}".format(time.asctime(), msg)
     # os.system("echo {} >> /opt/ezblock/log".format(_msg))
     # msg = '%s %s %s' % (tag, msg, tag)
