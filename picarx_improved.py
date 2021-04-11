@@ -117,7 +117,7 @@ def set_dir_servo_angle(value):
     global dir_cal_value, steering_angle
     dir_servo_pin.angle(value + dir_cal_value)
     steering_angle = value
-    return steering_angle
+    return f"Steering angle set to {steering_angle} degrees"
 
 
 @log_on_start(logging.DEBUG, "Message when function starts")
@@ -199,7 +199,7 @@ def forward(speed):
         left_ratio = left_radius / turning_radius
         set_motor_speed(1, -1 * left_ratio * speed)
         set_motor_speed(2, -1 * right_ratio * speed)
-        return left_ratio, right_ratio
+        return f"steering angle {steering_angle}, left {left_ratio}, right {right_ratio}"
     else:
         set_motor_speed(1, -1 * speed)
         set_motor_speed(2, -1 * speed)
