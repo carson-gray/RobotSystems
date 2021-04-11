@@ -186,19 +186,19 @@ def backward(speed):
 @log_on_end(logging.DEBUG, "Message when function ends successfully")
 def forward(speed):
     global dir_cal_value, steering_angle, car_len, wheel_base
+    if steering_angle != 0:
+        turning_radius = car_len / tan(steering_angle)
+        outer_radius = turning_radius + wheel_base / 2
+        inner_radius = turning_radius - wheel_base / 2
+        outer_ratio = outer_radius / turning_radius
+        inner_ratio = inner_radius / turning_radius
 
-    turning_radius = car_len / tan(steering_angle)
-    outer_radius = turning_radius + wheel_base / 2
-    inner_radius = turning_radius - wheel_base / 2
-    outer_ratio = outer_radius / turning_radius
-    inner_ratio = inner_radius / turning_radius
-
-    if steering_angle > 0:
-        set_motor_speed(1, -1 * outer_ratio * speed)
-        set_motor_speed(2, -1 * inner_ratio * speed)
-    elif steering_angle < 0:
-        set_motor_speed(1, -1 * inner_ratio * speed)
-        set_motor_speed(2, -1 * outer_ratio * speed)
+        if steering_angle > 0:
+            set_motor_speed(1, -1 * outer_ratio * speed)
+            set_motor_speed(2, -1 * inner_ratio * speed)
+        elif steering_angle < 0:
+            set_motor_speed(1, -1 * inner_ratio * speed)
+            set_motor_speed(2, -1 * outer_ratio * speed)
     else:
         set_motor_speed(1, -1 * speed)
         set_motor_speed(2, -1 * speed)
