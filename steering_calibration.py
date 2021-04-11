@@ -6,15 +6,15 @@ time.sleep(0.01)
 import picarx_improved as car
 
 time.sleep(0.01)
-car.forward(30)
+car.forward(60)
 car.set_dir_servo_angle(0)
 time.sleep(1)
 car.set_dir_servo_angle(15)
-time.sleep(1)
+time.sleep(3)
 car.set_dir_servo_angle(0)
 time.sleep(1)
 car.set_dir_servo_angle(-15)
-time.sleep(2)
+time.sleep(3)
 car.set_dir_servo_angle(0)
 
 #car.dir_servo_angle_calibration()
