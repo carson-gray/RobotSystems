@@ -197,8 +197,8 @@ def forward(speed):
         # ratio relative to center of wheel_base
         right_ratio = right_radius / turning_radius
         left_ratio = left_radius / turning_radius
-        set_motor_speed(1, -1 * left_ratio * speed)
-        set_motor_speed(2, -1 * right_ratio * speed)
+        set_motor_speed(1, -1 * right_ratio * speed)
+        set_motor_speed(2, -1 * left_ratio * speed)
         return f"steering angle {steering_angle}, turning radius {turning_radius}, left radius {left_radius}, " \
                f"right radius {right_radius}, left {left_ratio}, right {right_ratio}"
     else:
