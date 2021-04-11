@@ -9,7 +9,7 @@ except ImportError:
           " (/opt/ezblock is not present). Shadowing hardware calls"
           " with substitute functions.")
     from sim_ezblock import *
-from math import tan
+from math import tan, pi
 import logging
 from logdecorator import log_on_start, log_on_end, log_on_error
 logging_format = "%(asctime)s: %(message)s"
@@ -190,7 +190,7 @@ def forward(speed):
     global dir_cal_value, steering_angle, car_len, wheel_base
     if steering_angle != 0:
         # (-) t_r if left, (+) t_r if right
-        turning_radius = car_len / tan(steering_angle)
+        turning_radius = car_len / tan(steering_angle * pi / 180)
         # adjustments are correct for either turning direction
         right_radius = turning_radius - wheel_base / 2
         left_radius = turning_radius + wheel_base / 2
