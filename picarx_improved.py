@@ -194,8 +194,8 @@ def forward(speed):
         right_radius = turning_radius - wheel_base / 2
         left_radius = turning_radius + wheel_base / 2
         # ratio relative to center of wheel_base
-        right_ratio = abs(right_radius / turning_radius)
-        left_ratio = abs(left_radius / turning_radius)
+        right_ratio = right_radius / turning_radius
+        left_ratio = left_radius / turning_radius
         set_motor_speed(1, -1 * left_ratio * speed)
         set_motor_speed(2, -1 * right_ratio * speed)
     else:
