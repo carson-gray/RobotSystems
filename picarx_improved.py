@@ -198,9 +198,9 @@ def forward(speed):
         left_ratio = abs(left_radius / turning_radius)
         if right_ratio > left_ratio:
             set_motor_speed(1, -1 * left_ratio * speed / 10)
-            set_motor_speed(2, -1 * right_ratio * speed)
+            set_motor_speed(2, -1 * right_ratio * speed * 10)
         else:
-            set_motor_speed(1, -1 * left_ratio * speed)
+            set_motor_speed(1, -1 * left_ratio * speed * 10)
             set_motor_speed(2, -1 * right_ratio * speed / 10)
     else:
         set_motor_speed(1, -1 * speed)
