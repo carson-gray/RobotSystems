@@ -1,4 +1,6 @@
 import time
+import sys
+
 try:
     from ezblock import *
     from ezblock import __reset_mcu__
@@ -23,6 +25,9 @@ PERIOD = 4095
 PRESCALER = 10
 TIMEOUT = 0.02
 
+CAR_LENGTH = 3.6
+CAR_WIDTH = 4.4
+
 dir_servo_pin = Servo(PWM('P2'))
 camera_servo_pin1 = Servo(PWM('P0'))
 camera_servo_pin2 = Servo(PWM('P1'))
@@ -30,15 +35,13 @@ left_rear_pwm_pin = PWM("P13")
 right_rear_pwm_pin = PWM("P12")
 left_rear_dir_pin = Pin("D4")
 right_rear_dir_pin = Pin("D5")
-car_len = 3.6
-wheel_base = 4.4
 
 S0 = ADC('A0')
 S1 = ADC('A1')
 S2 = ADC('A2')
 
-Servo_dir_flag = 1
-dir_cal_value = 25
+servo_dir_flag = 1
+steering_calibration = 25
 cam_cal_value_1 = 0
 cam_cal_value_2 = 0
 motor_direction_pins = [left_rear_dir_pin, right_rear_dir_pin]
@@ -104,18 +107,18 @@ def motor_direction_calibration(motor, value):
 @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
 @log_on_end(logging.DEBUG, "Message when function ends successfully")
 def dir_servo_angle_calibration(value):
-    global dir_cal_value
-    dir_cal_value = value
-    set_dir_servo_angle(dir_cal_value)
-    # dir_servo_pin.angle(dir_cal_value)
+    global steering_calibration
+    steering_calibration = value
+    set_steering_angle(steering_calibration)
+    # dir_servo_pin.angle(steering_calibration)
 
 
 @log_on_start(logging.DEBUG, "Message when function starts")
 @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
 @log_on_end(logging.DEBUG, "{result!r}")
-def set_dir_servo_angle(value):
-    global dir_cal_value, steering_angle
-    dir_servo_pin.angle(value + dir_cal_value)
+def set_steering_angle(value):
+    global steering_calibration, steering_angle
+    dir_servo_pin.angle(value + steering_calibration)
     steering_angle = value
     return f"Steering angle set to {steering_angle} degrees"
 
@@ -187,14 +190,15 @@ def backward(speed):
 @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
 @log_on_end(logging.DEBUG, "{result!r}")
 def forward(speed):
-    global dir_cal_value, steering_angle, car_len, wheel_base
+    """ forward is + speed, backwards - speed"""
+    global steering_calibration, steering_angle, CAR_LENGTH, CAR_WIDTH
     if steering_angle != 0:
         # (-) t_r if left, (+) t_r if right
-        turning_radius = car_len / tan(steering_angle * pi / 180)
+        turning_radius = CAR_LENGTH / tan(steering_angle * pi / 180)
         # adjustments are correct for either turning direction
-        right_radius = turning_radius - wheel_base / 2
-        left_radius = turning_radius + wheel_base / 2
-        # ratio relative to center of wheel_base
+        right_radius = turning_radius - CAR_WIDTH / 2
+        left_radius = turning_radius + CAR_WIDTH / 2
+        # ratio relative to center of CAR_WIDTH
         right_ratio = right_radius / turning_radius
         left_ratio = left_radius / turning_radius
         set_motor_speed(1, -1 * right_ratio * speed)
@@ -218,7 +222,7 @@ def stop():
 @log_on_start(logging.DEBUG, "Message when function starts")
 @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
 @log_on_end(logging.DEBUG, "Message when function ends successfully")
-def Get_distance():
+def get_distance():
     timeout = 0.01
     trig = Pin('D8')
     echo = Pin('D9')
@@ -245,6 +249,125 @@ def Get_distance():
     return cm
 
 
+@log_on_start(logging.DEBUG, "Message when function starts")
+@log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
+@log_on_end(logging.DEBUG, "Message when function ends successfully")
+def drive(speed, turn_angle, duration=3.0):
+    set_steering_angle(turn_angle)
+    forward(speed)
+    time.sleep(duration)
+
+
+def stop_car():
+    drive(0, 0, .1)
+
+
+@log_on_start(logging.DEBUG, "Parallel parking to the right")
+@log_on_error(logging.DEBUG, "Error occurred while parallel parking right")
+@log_on_end(logging.DEBUG, "Parallel parking complete")
+def parallel_park_right():
+    drive(20, 0, 1)
+    drive(-20, 30, 0.5)
+    drive(-20, -30, 0.5)
+    drive(20, 0, 0.2)
+    stop_car()
+
+
+@log_on_start(logging.DEBUG, "Parallel parking to the left")
+@log_on_error(logging.DEBUG, "Error occurred while parallel parking left")
+@log_on_end(logging.DEBUG, "Parallel parking complete")
+def parallel_park_left():
+    drive(20, 0, 1)
+    drive(-20, -30, 0.5)
+    drive(-20, 30, 0.5)
+    drive(20, 0, 0.2)
+    stop_car()
+
+
+@log_on_start(logging.DEBUG, "K-turning to the right")
+@log_on_error(logging.DEBUG, "Error occurred while K-turning right")
+@log_on_end(logging.DEBUG, "K-turning complete")
+def k_turn_right():
+    drive(30, 30, 1)
+    drive(-30, -30, 1)
+    drive(30, 0, 0.5)
+    stop_car()
+
+
+@log_on_start(logging.DEBUG, "K-turning to the left")
+@log_on_error(logging.DEBUG, "Error occurred while K-turning left")
+@log_on_end(logging.DEBUG, "K-turning complete")
+def k_turn_left():
+    drive(30, -30, 1)
+    drive(-30, 30, 1)
+    drive(30, 0, 0.5)
+    stop_car()
+
+
+def clamp(value, value_id, lower_bound, upper_bound):
+    """ Clamp the value within a bounded range """
+    if value < lower_bound:
+        logging.debug(f"Adjusting {value_id} value [{value}] to [{lower_bound}]")
+        return lower_bound
+    if value > upper_bound:
+        logging.debug(f"Adjusting {value_id} value [{value}] to [{upper_bound}]")
+        return upper_bound
+    return value
+
+
+@log_on_start(logging.DEBUG, "Starting control terminal")
+@log_on_error(logging.DEBUG, "Error occurred during control")
+@log_on_end(logging.DEBUG, "Closing control terminal")
+def control_terminal():
+    while True:
+        user_in = input("Please enter "
+                        "[d] for drive, "
+                        "[p] for parallel park, "
+                        "[k] for k-turn, or "
+                        "[q] for quit: ")
+
+        if user_in.lower() == 'd':
+            try:
+                input_speed = int(input("What speed do you want?"
+                                        "\nPositive values are forward, negative backwards: "))
+                input_angle = int(input("What angle do you want?"
+                                        "\nPositive values are right, negative left: "))
+                input_time = int(input("How many seconds do you want the car to do this? "))
+            except ValueError:
+                logging.debug("Please enter an integer!")
+                continue
+            drive(clamp(input_speed, "speed", -100, 100),
+                  clamp(input_angle, "angle", -45, 45),
+                  clamp(input_time, "time", 1, 30))
+
+        elif user_in.lower() == 'p':
+            input_direction = input("Do you want to go left or right? [l]/[r]: ")
+            if input_direction.lower() == 'l':
+                parallel_park_left()
+            elif input_direction.lower() == 'r':
+                parallel_park_right()
+            else:
+                logging.debug("Please try again with 'l' or 'r'")
+                continue
+
+        elif user_in.lower() == 'k':
+            input_direction = input("Do you want to go left or right? [l]/[r]: ")
+            if input_direction.lower() == 'l':
+                k_turn_left()
+            elif input_direction.lower() == 'r':
+                k_turn_right()
+            else:
+                logging.debug("Please try again with 'l' or 'r'")
+                continue
+
+        elif user_in.lower() == 'q':
+            sys.exit()
+
+        else:
+            logging.debug("Please pick a valid option")
+            continue
+
+
 @log_on_start(logging.DEBUG, "Program shutting down...")
 @log_on_end(logging.DEBUG, "Program shut down successfully")
 def exit_function():
@@ -258,19 +381,16 @@ atexit.register(exit_function)
 @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
 @log_on_end(logging.DEBUG, "Message when function ends successfully")
 def test():
+    pass
     # dir_servo_angle_calibration(-10)
-    set_dir_servo_angle(-40)
+    # set_steering_angle(-40)
     # time.sleep(1)
-    # set_dir_servo_angle(0)
+    # set_steering_angle(0)
     # time.sleep(1)
     # set_motor_speed(1, 1)
     # set_motor_speed(2, 1)
     # camera_servo_pin.angle(0)
 
-# if __name__ == "__main__":
-#     try:
-#         # dir_servo_angle_calibration(-10)
-#         while 1:
-#             test()
-#     finally:
-#         stop()
+
+if __name__ == "__main__":
+    control_terminal()
