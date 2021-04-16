@@ -339,6 +339,7 @@ def control_terminal():
             drive(clamp(input_speed, "speed", -100, 100),
                   clamp(input_angle, "angle", -45, 45),
                   clamp(input_time, "time", 1, 30))
+            stop_car()
 
         elif user_in.lower() == 'p':
             input_direction = input("Do you want to go left or right? [l]/[r]: ")
