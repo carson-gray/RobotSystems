@@ -1,6 +1,5 @@
 import time
 import sys
-import picarx
 
 try:
     from ezblock import *
