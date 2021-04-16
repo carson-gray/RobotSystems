@@ -189,8 +189,8 @@ def backward(speed):
 @log_on_start(logging.DEBUG, "Message when function starts")
 @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
 @log_on_end(logging.DEBUG, "{result!r}")
-def forward(speed):
-    """ forward is + speed, backwards - speed"""
+def go(speed):
+    """ forward is positive speed, backwards negative speed"""
     global steering_calibration, steering_angle, CAR_LENGTH, CAR_WIDTH
     if steering_angle != 0:
         # (-) t_r if left, (+) t_r if right
@@ -254,7 +254,7 @@ def get_distance():
 @log_on_end(logging.DEBUG, "Message when function ends successfully")
 def drive(speed, turn_angle, duration=3.0):
     set_steering_angle(turn_angle)
-    forward(speed)
+    go(speed)
     time.sleep(duration)
 
 
@@ -267,8 +267,8 @@ def stop_car():
 @log_on_end(logging.DEBUG, "Parallel parking complete")
 def parallel_park_right():
     drive(20, 0, 1)
-    drive(-20, 30, 1)
-    drive(-20, -30, 1)
+    drive(-30, 30, 1)
+    drive(-30, -30, 1)
     drive(20, 0, 0.5)
     stop_car()
 
@@ -331,7 +331,7 @@ def control_terminal():
         if user_in.lower() == 'd':
             try:
                 input_speed = int(input("What speed do you want?"
-                                        "\nPositive values are forward, negative backwards: "))
+                                        "\nPositive values are go, negative backwards: "))
                 input_angle = int(input("What angle do you want?"
                                         "\nPositive values are right, negative left: "))
                 input_time = int(input("How many seconds do you want the car to do this? "))
