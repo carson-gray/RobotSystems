@@ -267,9 +267,9 @@ def stop_car():
 @log_on_end(logging.DEBUG, "Parallel parking complete")
 def parallel_park_right():
     drive(20, 0, 1)
-    drive(-20, 30, 0.5)
-    drive(-20, -30, 0.5)
-    drive(20, 0, 0.2)
+    drive(-20, 30, 1)
+    drive(-20, -30, 1)
+    drive(20, 0, 0.5)
     stop_car()
 
 
@@ -278,9 +278,9 @@ def parallel_park_right():
 @log_on_end(logging.DEBUG, "Parallel parking complete")
 def parallel_park_left():
     drive(20, 0, 1)
-    drive(-20, -30, 0.5)
-    drive(-20, 30, 0.5)
-    drive(20, 0, 0.2)
+    drive(-20, -30, 1)
+    drive(-20, 30, 1)
+    drive(20, 0, 0.5)
     stop_car()
 
 
@@ -290,6 +290,7 @@ def parallel_park_left():
 def k_turn_right():
     drive(30, 30, 1)
     drive(-30, -30, 1)
+    drive(30, 30, 1)
     drive(30, 0, 0.5)
     stop_car()
 
@@ -300,6 +301,7 @@ def k_turn_right():
 def k_turn_left():
     drive(30, -30, 1)
     drive(-30, 30, 1)
+    drive(30, -30, 1)
     drive(30, 0, 0.5)
     stop_car()
 
