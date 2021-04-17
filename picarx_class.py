@@ -62,7 +62,7 @@ class Picarx:
         self.set_motor_speed(1, 0)
         self.set_motor_speed(2, 0)
 
-    @log_on_start(logging.DEBUG, "Setting motor {motor:s}'s speed to {speed:s}")
+    @log_on_start(logging.DEBUG, "Setting motor {motor:d}'s speed to {speed:d}")
     @log_on_error(logging.DEBUG, "Error setting motor speed")
     @log_on_end(logging.DEBUG, "Motor speed set successfully")
     def set_motor_speed(self, motor, speed):
@@ -79,7 +79,7 @@ class Picarx:
             self.motor_direction_pins[motor].low()
             self.motor_speed_pins[motor].pulse_width_percent(speed)
 
-    @log_on_start(logging.DEBUG, "Setting steering angle to {value:s}")
+    @log_on_start(logging.DEBUG, "Setting steering angle to {value:d}")
     @log_on_error(logging.DEBUG, "Error setting steering angle")
     @log_on_end(logging.DEBUG, "Steering angle set to {result!r} degrees")
     def set_steering_angle(self, value):
