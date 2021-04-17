@@ -60,11 +60,13 @@ class PicarX:
 
     @log_on_start(logging.DEBUG, "Stopping car and shutting down program")
     def cleanup(self):
+        """ Stop motors on exit """
         self.set_motor_speed(1, 0)
         self.set_motor_speed(2, 0)
 
     @log_on_start(logging.DEBUG, "Setting motor {motor:d}'s speed to {speed:f}")
     def set_motor_speed(self, motor, speed):
+        """ Called separately for each motor """
         motor -= 1
         if speed >= 0:
             direction = 1 * self.cali_dir_value[motor]
@@ -80,6 +82,7 @@ class PicarX:
 
     @log_on_start(logging.DEBUG, "Setting steering angle to {value:d}")
     def set_steering_angle(self, value):
+        """ User input plus the calibration value """
         self.dir_servo_pin.angle(value + self.steering_calibration)
         self.steering_angle = value
 
@@ -105,6 +108,7 @@ class PicarX:
 
     @log_on_start(logging.DEBUG, "Driving with Speed: {speed:d}, Angle: {turn_angle:d}, & Duration: {duration:f}")
     def drive(self, speed, turn_angle, duration=3.0):
+        """ Puts steering, speed, and time control in one place """
         self.set_steering_angle(turn_angle)
         self.go(speed)
         time.sleep(duration)
