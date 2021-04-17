@@ -18,10 +18,10 @@ logging_format = "%(asctime)s: %(message)s"
 logging.basicConfig(format=logging_format, level=logging.INFO,
                     datefmt="%H:%M:%S")
 # comment out this line to disable logging
-logging.getLogger().setLevel(logging.DEBUG)
+# logging.getLogger().setLevel(logging.DEBUG)
 
 
-class Picarx:
+class PicarX:
     """ Motor controls for the Picar-X system """
     def __init__(self):
         self.PERIOD = 4095
@@ -58,13 +58,12 @@ class Picarx:
 
         atexit.register(self.cleanup)
 
+    @log_on_start(logging.DEBUG, "Stopping car and shutting down program")
     def cleanup(self):
         self.set_motor_speed(1, 0)
         self.set_motor_speed(2, 0)
 
     @log_on_start(logging.DEBUG, "Setting motor {motor:d}'s speed to {speed:f}")
-    @log_on_error(logging.DEBUG, "Error setting motor speed")
-    @log_on_end(logging.DEBUG, "Motor speed set successfully")
     def set_motor_speed(self, motor, speed):
         motor -= 1
         if speed >= 0:
@@ -80,14 +79,10 @@ class Picarx:
             self.motor_speed_pins[motor].pulse_width_percent(speed)
 
     @log_on_start(logging.DEBUG, "Setting steering angle to {value:d}")
-    @log_on_error(logging.DEBUG, "Error setting steering angle")
-    @log_on_end(logging.DEBUG, "Steering angle set to {result!r} degrees")
     def set_steering_angle(self, value):
         self.dir_servo_pin.angle(value + self.steering_calibration)
         self.steering_angle = value
-        return self.steering_angle
 
-    @log_on_error(logging.DEBUG, "Error in go function")
     @log_on_end(logging.DEBUG, "{result!r}")
     def go(self, speed):
         """ forward is positive speed, backwards negative speed"""
@@ -108,9 +103,7 @@ class Picarx:
             self.set_motor_speed(2, -1 * speed)
             return f"Wheel speed ratios: left {1}, right {1}"
 
-    @log_on_start(logging.DEBUG, "Message when function starts")
-    @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
-    @log_on_end(logging.DEBUG, "Message when function ends successfully")
+    @log_on_start(logging.DEBUG, "Driving with Speed: {speed:d}, Angle: {turn_angle:d}, & Duration: {duration:f}")
     def drive(self, speed, turn_angle, duration=3.0):
         self.set_steering_angle(turn_angle)
         self.go(speed)
@@ -121,8 +114,6 @@ class Picarx:
         self.drive(0, 0, .1)
 
     @log_on_start(logging.DEBUG, "Parallel parking to the right")
-    @log_on_error(logging.DEBUG, "Error occurred while parallel parking right")
-    @log_on_end(logging.DEBUG, "Parallel parking complete")
     def parallel_park_right(self):
         self.drive(20, 0, 1)
         self.drive(-30, 30, 1)
@@ -131,8 +122,6 @@ class Picarx:
         self.stop_car()
 
     @log_on_start(logging.DEBUG, "Parallel parking to the left")
-    @log_on_error(logging.DEBUG, "Error occurred while parallel parking left")
-    @log_on_end(logging.DEBUG, "Parallel parking complete")
     def parallel_park_left(self):
         self.drive(20, 0, 1)
         self.drive(-20, -30, 1)
@@ -141,8 +130,6 @@ class Picarx:
         self.stop_car()
 
     @log_on_start(logging.DEBUG, "K-turning to the right")
-    @log_on_error(logging.DEBUG, "Error occurred while K-turning right")
-    @log_on_end(logging.DEBUG, "K-turning complete")
     def k_turn_right(self):
         self.drive(30, 30, 1)
         self.drive(-30, -30, 1)
@@ -151,8 +138,6 @@ class Picarx:
         self.stop_car()
 
     @log_on_start(logging.DEBUG, "K-turning to the left")
-    @log_on_error(logging.DEBUG, "Error occurred while K-turning left")
-    @log_on_end(logging.DEBUG, "K-turning complete")
     def k_turn_left(self):
         self.drive(30, -30, 1)
         self.drive(-30, 30, 1)
@@ -170,21 +155,20 @@ class Picarx:
             return upper_bound
         return value
 
-    @log_on_start(logging.DEBUG, "Starting control terminal")
-    @log_on_error(logging.DEBUG, "Error occurred during control")
-    @log_on_end(logging.DEBUG, "Closing control terminal")
+    @log_on_start(logging.DEBUG, "Starting the control terminal")
     def control_terminal(self):
+        """ Drive, parallel park, and k-turn robot """
         while True:
-            user_in = input("Please enter "
-                            "[d] for drive, "
-                            "[p] for parallel park, "
-                            "[k] for k-turn, or "
-                            "[q] for quit: ")
+            user_in = input("\nPlease enter "
+                            "\n[d] for drive, "
+                            "\n[p] for parallel park, "
+                            "\n[k] for k-turn, or "
+                            "\n[q] for quit: ")
 
             if user_in.lower() == 'd':
                 try:
                     input_speed = int(input("What speed do you want?"
-                                            "\nPositive values are go, negative backwards: "))
+                                            "\nPositive values are forward, negative backwards: "))
                     input_angle = int(input("What angle do you want?"
                                             "\nPositive values are right, negative left: "))
                     input_time = int(input("How many seconds do you want the car to do this? "))
@@ -225,5 +209,5 @@ class Picarx:
 
 
 if __name__ == "__main__":
-    car = Picarx()
+    car = PicarX()
     car.control_terminal()
