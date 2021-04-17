@@ -62,9 +62,9 @@ class Picarx:
         self.set_motor_speed(1, 0)
         self.set_motor_speed(2, 0)
 
-    @log_on_start(logging.DEBUG, "Message when function starts")
-    @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
-    @log_on_end(logging.DEBUG, "Message when function ends successfully")
+    @log_on_start(logging.DEBUG, "Setting motor {motor:s}'s speed to {speed:s}")
+    @log_on_error(logging.DEBUG, "Error setting motor speed")
+    @log_on_end(logging.DEBUG, "Motor speed set successfully")
     def set_motor_speed(self, motor, speed):
         motor -= 1
         if speed >= 0:
@@ -78,6 +78,150 @@ class Picarx:
         else:
             self.motor_direction_pins[motor].low()
             self.motor_speed_pins[motor].pulse_width_percent(speed)
+
+    @log_on_start(logging.DEBUG, "Setting steering angle to {value:s}")
+    @log_on_error(logging.DEBUG, "Error setting steering angle")
+    @log_on_end(logging.DEBUG, "Steering angle set to {result!r} degrees")
+    def set_steering_angle(self, value):
+        self.dir_servo_pin.angle(value + self.steering_calibration)
+        self.steering_angle = value
+        return self.steering_angle
+
+    @log_on_error(logging.DEBUG, "Error in go function")
+    @log_on_end(logging.DEBUG, "{result!r}")
+    def go(self, speed):
+        """ forward is positive speed, backwards negative speed"""
+        if self.steering_angle != 0:
+            # (-) t_r if left, (+) t_r if right
+            turning_radius = self.CAR_LENGTH / tan(self.steering_angle * pi / 180)
+            # adjustments are correct for either turning direction
+            right_radius = turning_radius - self.CAR_WIDTH / 2
+            left_radius = turning_radius + self.CAR_WIDTH / 2
+            # ratio relative to center of CAR_WIDTH
+            right_ratio = right_radius / turning_radius
+            left_ratio = left_radius / turning_radius
+            self.set_motor_speed(1, -1 * right_ratio * speed)
+            self.set_motor_speed(2, -1 * left_ratio * speed)
+            return f"Wheel speed ratios: left {left_ratio}, right {right_ratio}"
+        else:
+            self.set_motor_speed(1, -1 * speed)
+            self.set_motor_speed(2, -1 * speed)
+            return f"Wheel speed ratios: left {1}, right {1}"
+
+    @log_on_start(logging.DEBUG, "Message when function starts")
+    @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
+    @log_on_end(logging.DEBUG, "Message when function ends successfully")
+    def drive(self, speed, turn_angle, duration=3.0):
+        self.set_steering_angle(turn_angle)
+        self.go(speed)
+        time.sleep(duration)
+
+    @log_on_start(logging.DEBUG, "Stopping car")
+    def stop_car(self):
+        self.drive(0, 0, .1)
+
+    @log_on_start(logging.DEBUG, "Parallel parking to the right")
+    @log_on_error(logging.DEBUG, "Error occurred while parallel parking right")
+    @log_on_end(logging.DEBUG, "Parallel parking complete")
+    def parallel_park_right(self):
+        self.drive(20, 0, 1)
+        self.drive(-30, 30, 1)
+        self.drive(-30, -30, 1)
+        self.drive(20, 0, 0.5)
+        self.stop_car()
+
+    @log_on_start(logging.DEBUG, "Parallel parking to the left")
+    @log_on_error(logging.DEBUG, "Error occurred while parallel parking left")
+    @log_on_end(logging.DEBUG, "Parallel parking complete")
+    def parallel_park_left(self):
+        self.drive(20, 0, 1)
+        self.drive(-20, -30, 1)
+        self.drive(-20, 30, 1)
+        self.drive(20, 0, 0.5)
+        self.stop_car()
+
+    @log_on_start(logging.DEBUG, "K-turning to the right")
+    @log_on_error(logging.DEBUG, "Error occurred while K-turning right")
+    @log_on_end(logging.DEBUG, "K-turning complete")
+    def k_turn_right(self):
+        self.drive(30, 30, 1)
+        self.drive(-30, -30, 1)
+        self.drive(30, 30, 1)
+        self.drive(30, 0, 0.5)
+        self.stop_car()
+
+    @log_on_start(logging.DEBUG, "K-turning to the left")
+    @log_on_error(logging.DEBUG, "Error occurred while K-turning left")
+    @log_on_end(logging.DEBUG, "K-turning complete")
+    def k_turn_left(self):
+        self.drive(30, -30, 1)
+        self.drive(-30, 30, 1)
+        self.drive(30, -30, 1)
+        self.drive(30, 0, 0.5)
+        self.stop_car()
+
+    def clamp(self, value, value_id, lower_bound, upper_bound):
+        """ Clamp the value within a bounded range """
+        if value < lower_bound:
+            logging.debug(f"Adjusting {value_id} value [{value}] to [{lower_bound}]")
+            return lower_bound
+        if value > upper_bound:
+            logging.debug(f"Adjusting {value_id} value [{value}] to [{upper_bound}]")
+            return upper_bound
+        return value
+
+    @log_on_start(logging.DEBUG, "Starting control terminal")
+    @log_on_error(logging.DEBUG, "Error occurred during control")
+    @log_on_end(logging.DEBUG, "Closing control terminal")
+    def control_terminal(self):
+        while True:
+            user_in = input("Please enter "
+                            "[d] for drive, "
+                            "[p] for parallel park, "
+                            "[k] for k-turn, or "
+                            "[q] for quit: ")
+
+            if user_in.lower() == 'd':
+                try:
+                    input_speed = int(input("What speed do you want?"
+                                            "\nPositive values are go, negative backwards: "))
+                    input_angle = int(input("What angle do you want?"
+                                            "\nPositive values are right, negative left: "))
+                    input_time = int(input("How many seconds do you want the car to do this? "))
+                except ValueError:
+                    logging.debug("Please enter an integer!")
+                    continue
+                self.drive(self.clamp(input_speed, "speed", -100, 100),
+                           self.clamp(input_angle, "angle", -45, 45),
+                           self.clamp(input_time, "time", 1, 30))
+                self.stop_car()
+
+            elif user_in.lower() == 'p':
+                input_direction = input("Do you want to go left or right? [l]/[r]: ")
+                if input_direction.lower() == 'l':
+                    self.parallel_park_left()
+                elif input_direction.lower() == 'r':
+                    self.parallel_park_right()
+                else:
+                    logging.debug("Please try again with 'l' or 'r'")
+                    continue
+
+            elif user_in.lower() == 'k':
+                input_direction = input("Do you want to go left or right? [l]/[r]: ")
+                if input_direction.lower() == 'l':
+                    self.k_turn_left()
+                elif input_direction.lower() == 'r':
+                    self.k_turn_right()
+                else:
+                    logging.debug("Please try again with 'l' or 'r'")
+                    continue
+
+            elif user_in.lower() == 'q':
+                sys.exit()
+
+            else:
+                logging.debug("Please pick a valid option")
+                continue
 
 
 if __name__ == "__main__":

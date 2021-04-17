@@ -214,14 +214,6 @@ def go(speed):
 @log_on_start(logging.DEBUG, "Message when function starts")
 @log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
 @log_on_end(logging.DEBUG, "Message when function ends successfully")
-def stop():
-    set_motor_speed(1, 0)
-    set_motor_speed(2, 0)
-
-
-@log_on_start(logging.DEBUG, "Message when function starts")
-@log_on_error(logging.DEBUG, "Message when function encounters an error before completing")
-@log_on_end(logging.DEBUG, "Message when function ends successfully")
 def get_distance():
     timeout = 0.01
     trig = Pin('D8')
