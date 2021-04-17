@@ -62,7 +62,7 @@ class Picarx:
         self.set_motor_speed(1, 0)
         self.set_motor_speed(2, 0)
 
-    @log_on_start(logging.DEBUG, "Setting motor {motor:d}'s speed to {speed:d}")
+    @log_on_start(logging.DEBUG, "Setting motor {motor:d}'s speed to {speed:f}")
     @log_on_error(logging.DEBUG, "Error setting motor speed")
     @log_on_end(logging.DEBUG, "Motor speed set successfully")
     def set_motor_speed(self, motor, speed):
