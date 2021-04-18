@@ -44,6 +44,7 @@ class Interpreter:
     def process(self, sensor_reading):
         """ Takes in three item Sensor input list """
         new_a0, new_a1, new_a2 = sensor_reading[0], sensor_reading[1], sensor_reading[2]
+        logging.debug(sensor_reading)
 
         d_a0 = self.last_a0 - new_a0
         d_a1 = self.last_a1 - new_a1
@@ -67,5 +68,4 @@ if __name__ == "__main__":
 
     for n in range(10):
         robot_position = interpreter.process(sensor.take_reading())
-        logging.debug(robot_position)
         time.sleep(1)
