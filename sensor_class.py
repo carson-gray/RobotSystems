@@ -9,6 +9,13 @@ except ImportError:
           " (/opt/ezblock is not present). Shadowing hardware calls"
           " with substitute functions.")
     from sim_ezblock import *
+import logging
+from logdecorator import log_on_start, log_on_end, log_on_error
+logging_format = "%(asctime)s: %(message)s"
+logging.basicConfig(format=logging_format, level=logging.INFO,
+                    datefmt="%H:%M:%S")
+# comment out this line to disable logging
+logging.getLogger().setLevel(logging.DEBUG)
 
 
 class Sensor:
@@ -60,5 +67,5 @@ if __name__ == "__main__":
 
     for n in range(10):
         robot_position = interpreter.process(sensor.take_reading())
-        print(robot_position)
+        logging.debug(robot_position)
         time.sleep(1)
