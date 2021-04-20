@@ -19,53 +19,98 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 
 class Sensor:
+    @log_on_start(logging.DEBUG, "Creating a Sensor.")
+    @log_on_error(logging.DEBUG, "Failed to create a Sensor")
     def __init__(self):
         self.a0 = ADC('A0')
         self.a1 = ADC('A1')
         self.a2 = ADC('A2')
 
+    @log_on_error(logging.DEBUG, "Failed to take a sensor reading")
+    @log_on_end(logging.DEBUG, "New sensor poll: {result!r}")
     def take_reading(self):
         return [self.a0.read(), self.a1.read(), self.a2.read()]
 
 
 class Interpreter:
-    def __init__(self, sensitivity=3, polarity=3):
-        """ Interprets the color sensor
+    @log_on_start(logging.DEBUG, "Creating an Interpreter.")
+    @log_on_error(logging.DEBUG, "Failed to create an Interpreter")
+    def __init__(self, reading, sensitivity=600, polarity=1):
+        """ Interprets the color sensor. Start robot with middle sensor on the line.
 
         Keyword arguments:
-        sensitivity: how different dark and light readings are expected to be
-        polarity: is the line being followed darker or lighter than surrounding floor?
+            reading: an initial sensor reading
+            sensitivity: how different dark and light readings are expected to be
+            polarity: if line is darker than floor, 1. If line is lighter, -1.
         """
 
         self.sensitivity = sensitivity
-        self.polarity = polarity
-        self.last_a0, self.last_a1, self.last_a2 = 0, 0, 0
+        if polarity > 0:
+            self.polarity = 1
+        else:
+            self.polarity = -1
 
+        # robot starts with middle sensor on the line
+        self.on_line = [False, True, False]
+        # initialize sensor reading
+        self.last_poll = [reading[0], reading[1], reading[2]]
+
+    @log_on_start(logging.DEBUG, "Processing sensor reading.")
+    @log_on_error(logging.DEBUG, "Failed to process sensor reading.")
     def process(self, sensor_reading):
         """ Takes in three item Sensor input list """
-        new_a0, new_a1, new_a2 = sensor_reading[0], sensor_reading[1], sensor_reading[2]
-        logging.debug(sensor_reading)
+        new_poll = sensor_reading
 
-        d_a0 = self.last_a0 - new_a0
-        d_a1 = self.last_a1 - new_a1
-        d_a2 = self.last_a2 - new_a2
-
-        fancy_info = sensor_reading[0]
+        # For sensor AN: A0, A1, A2
+        for AN in range(3):
+            # find change in sensor value
+            d_a = self.last_poll[AN] - new_poll[AN]
+            # check if it crossed the sensitivity threshold
+            if abs(d_a) > self.sensitivity:
+                # is the change in the direction of the target line?
+                # pos. polarity for dark line, neg. polarity for light line
+                if d_a * self.polarity < 0:
+                    self.on_line[AN] = False
+                else:
+                    self.on_line[AN] = True
 
         # store the most recent sensor reading
-        self.last_a0, self.last_a1, self.last_a2 = new_a0, new_a1, new_a2
-        return self.output(fancy_info)
+        self.last_poll = new_poll
+        return self.output()
 
-    def output(self, fancy_info):
+    @log_on_error(logging.DEBUG, "Failed to process output.")
+    @log_on_end(logging.DEBUG, "Robot position: {result!r}")
+    def output(self):
         """ Returns robot position relative to line on continuum of [-1, 1],
         where -1 is left and 1 is right """
-        return fancy_info
+
+        # robot is positioned correctly
+        if self.on_line == [False, True, False]:
+            return 0.0
+
+        # robot is slightly to the right
+        elif self.on_line == [True, True, False]:
+            return 0.5
+        # robot is slightly to the left
+        elif self.on_line == [False, True, True]:
+            return -0.5
+
+        # robot is significantly to the right
+        elif self.on_line == [True, False, False]:
+            return 1.0
+        # robot is significantly to the left
+        elif self.on_line == [False, False, True]:
+            return -1.0
+
+        # something is wrong
+        else:
+            return None
 
 
 if __name__ == "__main__":
     sensor = Sensor()
-    interpreter = Interpreter()
+    interpreter = Interpreter(sensor.take_reading())
 
-    for n in range(10):
+    for n in range(20):
         robot_position = interpreter.process(sensor.take_reading())
         time.sleep(1)
