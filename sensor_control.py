@@ -105,7 +105,7 @@ class Interpreter:
 
         # something is wrong
         else:
-            return None
+            return 0.0
 
 
 class Controller:
@@ -125,11 +125,12 @@ if __name__ == "__main__":
     interpreter = Interpreter(sensor.take_reading())
     controller = Controller()
     car = PicarX()
+    car.set_steering_angle(0.0)
 
     for n in range(100):
         reading = sensor.take_reading()
         offset = interpreter.process(reading)
         angle = controller.route(offset)
-        car.drive(20, angle, 0.5)
+        car.drive(20.0, angle, 0.1)
 
     car.stop_car()
