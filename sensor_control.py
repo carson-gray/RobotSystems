@@ -128,7 +128,7 @@ if __name__ == "__main__":
     car.set_steering_angle(0.0)
     car.go(20.0)
 
-    for n in range(100):
+    for n in range(10000):
         reading = sensor.take_reading()
         offset = interpreter.process(reading)
         angle = controller.route(offset)
