@@ -126,11 +126,12 @@ if __name__ == "__main__":
     controller = Controller()
     car = PicarX()
     car.set_steering_angle(0.0)
+    car.go(20.0)
 
     for n in range(100):
         reading = sensor.take_reading()
         offset = interpreter.process(reading)
         angle = controller.route(offset)
-        car.drive(20.0, angle, 0.1)
+        car.set_steering_angle(angle)
 
     car.stop_car()
