@@ -80,7 +80,7 @@ class PicarX:
             self.motor_direction_pins[motor].low()
             self.motor_speed_pins[motor].pulse_width_percent(speed)
 
-    @log_on_start(logging.DEBUG, "Setting steering angle to {value:d}")
+    @log_on_start(logging.DEBUG, "Setting steering angle to {value:f}")
     def set_steering_angle(self, value):
         """ User input plus the calibration value """
         self.dir_servo_pin.angle(value + self.steering_calibration)
@@ -106,7 +106,7 @@ class PicarX:
             self.set_motor_speed(2, -1 * speed)
             return f"Wheel speed ratios: left {1}, right {1}"
 
-    @log_on_start(logging.DEBUG, "Driving with Speed: {speed:d}, Angle: {turn_angle:d}, & Duration: {duration:f}")
+    @log_on_start(logging.DEBUG, "Driving with Speed: {speed:f}, Angle: {turn_angle:f}, & Duration: {duration:f}")
     def drive(self, speed, turn_angle, duration=3.0):
         """ Puts steering, speed, and time control in one place """
         self.set_steering_angle(turn_angle)
@@ -115,38 +115,38 @@ class PicarX:
 
     @log_on_start(logging.DEBUG, "Stopping car")
     def stop_car(self):
-        self.drive(0, 0, .1)
+        self.drive(0.0, 0.0, .1)
 
     @log_on_start(logging.DEBUG, "Parallel parking to the right")
     def parallel_park_right(self):
-        self.drive(20, 0, 1)
-        self.drive(-30, 30, 1)
-        self.drive(-30, -30, 1)
-        self.drive(20, 0, 0.5)
+        self.drive(20.0, 0.0, 1.0)
+        self.drive(-30.0, 30.0, 1.0)
+        self.drive(-30.0, -30.0, 1.0)
+        self.drive(20.0, 0.0, 0.5)
         self.stop_car()
 
     @log_on_start(logging.DEBUG, "Parallel parking to the left")
     def parallel_park_left(self):
-        self.drive(20, 0, 1)
-        self.drive(-20, -30, 1)
-        self.drive(-20, 30, 1)
-        self.drive(20, 0, 0.5)
+        self.drive(20.0, 0.0, 1.0)
+        self.drive(-20.0, -30.0, 1.0)
+        self.drive(-20.0, 30.0, 1.0)
+        self.drive(20.0, 0.0, 0.5)
         self.stop_car()
 
     @log_on_start(logging.DEBUG, "K-turning to the right")
     def k_turn_right(self):
-        self.drive(30, 30, 1)
-        self.drive(-30, -30, 1)
-        self.drive(30, 30, 1)
-        self.drive(30, 0, 0.5)
+        self.drive(30.0, 30.0, 1.0)
+        self.drive(-30.0, -30.0, 1.0)
+        self.drive(30.0, 30.0, 1.0)
+        self.drive(30.0, 0.0, 0.5)
         self.stop_car()
 
     @log_on_start(logging.DEBUG, "K-turning to the left")
     def k_turn_left(self):
-        self.drive(30, -30, 1)
-        self.drive(-30, 30, 1)
-        self.drive(30, -30, 1)
-        self.drive(30, 0, 0.5)
+        self.drive(30.0, -30.0, 1.0)
+        self.drive(-30.0, 30.0, 1.0)
+        self.drive(30.0, -30.0, 1.0)
+        self.drive(30.0, 0.0, 0.5)
         self.stop_car()
 
     def clamp(self, value, value_id, lower_bound, upper_bound):
@@ -171,17 +171,17 @@ class PicarX:
 
             if user_in.lower() == 'd':
                 try:
-                    input_speed = int(input("What speed do you want?"
-                                            "\nPositive values are forward, negative backwards: "))
-                    input_angle = int(input("What angle do you want?"
-                                            "\nPositive values are right, negative left: "))
-                    input_time = int(input("How many seconds do you want the car to do this? "))
+                    input_speed = float(input("What speed do you want?"
+                                              "\nPositive values are forward, negative backwards: "))
+                    input_angle = float(input("What angle do you want?"
+                                              "\nPositive values are right, negative left: "))
+                    input_time = float(input("How many seconds do you want the car to do this? "))
                 except ValueError:
                     logging.debug("Please enter an integer!")
                     continue
-                self.drive(self.clamp(input_speed, "speed", -100, 100),
-                           self.clamp(input_angle, "angle", -45, 45),
-                           self.clamp(input_time, "time", 1, 30))
+                self.drive(self.clamp(input_speed, "speed", -100.0, 100.0),
+                           self.clamp(input_angle, "angle", -45.0, 45.0),
+                           self.clamp(input_time, "time", 1.0, 30.0))
                 self.stop_car()
 
             elif user_in.lower() == 'p':
