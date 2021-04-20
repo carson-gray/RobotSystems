@@ -9,6 +9,7 @@ except ImportError:
           " (/opt/ezblock is not present). Shadowing hardware calls"
           " with substitute functions.")
     from sim_ezblock import *
+from picarx_class import PicarX
 import logging
 from logdecorator import log_on_start, log_on_end, log_on_error
 logging_format = "%(asctime)s: %(message)s"
@@ -82,7 +83,7 @@ class Interpreter:
     @log_on_end(logging.DEBUG, "Robot position: {result!r}")
     def output(self):
         """ Returns robot position relative to line on continuum of [-1, 1],
-        where -1 is left and 1 is right """
+        where -1 means the robot should go left, +1 should go right """
 
         # robot is positioned correctly
         if self.on_line == [False, True, False]:
@@ -90,27 +91,45 @@ class Interpreter:
 
         # robot is slightly to the right
         elif self.on_line == [True, True, False]:
-            return 0.5
+            return -0.5
         # robot is slightly to the left
         elif self.on_line == [False, True, True]:
-            return -0.5
+            return 0.5
 
         # robot is significantly to the right
         elif self.on_line == [True, False, False]:
-            return 1.0
+            return -1.0
         # robot is significantly to the left
         elif self.on_line == [False, False, True]:
-            return -1.0
+            return 1.0
 
         # something is wrong
         else:
             return None
 
 
+class Controller:
+    @log_on_start(logging.DEBUG, "Creating a Controller.")
+    @log_on_error(logging.DEBUG, "Failed to create a Controller.")
+    def __init__(self, scalar=20):
+        """ scalar is the angle by which to steer based on position error """
+        self.scalar = scalar
+
+    def route(self, offset):
+        """ returns car steering angle """
+        return offset * self.scalar
+
+
 if __name__ == "__main__":
     sensor = Sensor()
     interpreter = Interpreter(sensor.take_reading())
+    controller = Controller()
+    car = PicarX()
 
-    for n in range(20):
-        robot_position = interpreter.process(sensor.take_reading())
-        time.sleep(1)
+    for n in range(100):
+        reading = sensor.take_reading()
+        offset = interpreter.process(reading)
+        angle = controller.route(offset)
+        car.drive(20, angle, 0.5)
+
+    car.stop_car()
