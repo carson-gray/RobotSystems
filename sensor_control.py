@@ -111,7 +111,7 @@ class Interpreter:
 class Controller:
     @log_on_start(logging.DEBUG, "Creating a Controller.")
     @log_on_error(logging.DEBUG, "Failed to create a Controller.")
-    def __init__(self, scalar=45):
+    def __init__(self, scalar=30):
         """ scalar is the angle by which to steer based on position error """
         self.scalar = scalar
 
