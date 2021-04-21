@@ -50,6 +50,7 @@ class Interpreter:
             self.polarity = 1
         else:
             self.polarity = -1
+        self.last_steer = 0.0
 
         # robot starts with middle sensor on the line
         self.on_line = [False, True, False]
@@ -77,7 +78,8 @@ class Interpreter:
 
         # store the most recent sensor reading
         self.last_poll = new_poll
-        return self.output()
+        self.last_steer = self.output()
+        return self.last_steer
 
     @log_on_error(logging.DEBUG, "Failed to process output.")
     @log_on_end(logging.DEBUG, "Robot position: {result!r}")
@@ -103,9 +105,9 @@ class Interpreter:
         elif self.on_line == [False, False, True]:
             return 1.0
 
-        # occurs sometimes as an intermediate value
+        # if off the line, do what you did last
         elif self.on_line == [False, False, False]:
-            return 0.0
+            return self.last_steer
 
 
 class Controller:
