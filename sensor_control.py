@@ -105,8 +105,8 @@ class Interpreter:
         elif self.on_line == [False, False, True]:
             return 1.0
 
-        # if off the line, do what you did last
-        elif self.on_line == [False, False, False]:
+        # if off the line (or a wacky case), so do what you did last
+        else:
             return self.last_steer
 
 
