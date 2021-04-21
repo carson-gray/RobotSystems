@@ -131,5 +131,5 @@ if __name__ == "__main__":
         reading = sensor.take_reading()
         offset = interpreter.process(reading)
         angle = controller.route(offset)
-        car.drive(30.0, angle, 0.5)
+        car.drive(25.0, angle, 0.5)
 
