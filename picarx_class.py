@@ -63,6 +63,7 @@ class PicarX:
         """ Stop motors on exit """
         self.set_motor_speed(1, 0)
         self.set_motor_speed(2, 0)
+        self.set_steering_angle(0.0)
 
     @log_on_start(logging.DEBUG, "Setting motor {motor:d}'s speed to {speed:f}")
     def set_motor_speed(self, motor, speed):
