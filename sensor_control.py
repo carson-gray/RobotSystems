@@ -36,7 +36,7 @@ class Sensor:
 class Interpreter:
     @log_on_start(logging.DEBUG, "Creating an Interpreter.")
     @log_on_error(logging.DEBUG, "Failed to create an Interpreter")
-    def __init__(self, reading, sensitivity=600, polarity=1):
+    def __init__(self, reading, sensitivity=400, polarity=1):
         """ Interprets the color sensor. Start robot with middle sensor on the line.
 
         Keyword arguments:
@@ -68,7 +68,7 @@ class Interpreter:
             d_a = self.last_poll[AN] - new_poll[AN]
             # check if it crossed the sensitivity threshold
             if abs(d_a) > self.sensitivity:
-                # is the change in the direction of the target line?
+                # what is the change in the direction of the target line?
                 # pos. polarity for dark line, neg. polarity for light line
                 if d_a * self.polarity < 0:
                     self.on_line[AN] = False
@@ -91,10 +91,10 @@ class Interpreter:
 
         # robot is slightly to the right
         elif self.on_line == [True, True, False]:
-            return -0.5
+            return -0.75
         # robot is slightly to the left
         elif self.on_line == [False, True, True]:
-            return 0.5
+            return 0.75
 
         # robot is significantly to the right
         elif self.on_line == [True, False, False]:
@@ -105,13 +105,14 @@ class Interpreter:
 
         # something is wrong
         else:
+            logging.debug("Error: No offset determined")
             return 0.0
 
 
 class Controller:
     @log_on_start(logging.DEBUG, "Creating a Controller.")
     @log_on_error(logging.DEBUG, "Failed to create a Controller.")
-    def __init__(self, scalar=40):
+    def __init__(self, scalar=45):
         """ scalar is the angle by which to steer based on position error """
         self.scalar = scalar
 
