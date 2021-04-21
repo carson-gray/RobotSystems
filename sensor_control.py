@@ -91,10 +91,10 @@ class Interpreter:
 
         # robot is slightly to the right
         elif self.on_line == [True, True, False]:
-            return -0.75
+            return -0.3
         # robot is slightly to the left
         elif self.on_line == [False, True, True]:
-            return 0.75
+            return 0.3
 
         # robot is significantly to the right
         elif self.on_line == [True, False, False]:
