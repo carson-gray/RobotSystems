@@ -103,9 +103,8 @@ class Interpreter:
         elif self.on_line == [False, False, True]:
             return 1.0
 
-        # something is wrong
-        else:
-            logging.debug("Error: No offset determined")
+        # occurs sometimes as an intermediate value
+        elif self.on_line == [False, False, False]:
             return 0.0
 
 
