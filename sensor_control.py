@@ -126,7 +126,7 @@ if __name__ == "__main__":
     controller = Controller()
     car = PicarX()
     car.set_steering_angle(0.0)
-    car.go(20.0)
+    car.go(30.0)
 
     while True:
         reading = sensor.take_reading()
