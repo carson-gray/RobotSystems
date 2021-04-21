@@ -133,4 +133,5 @@ if __name__ == "__main__":
         offset = interpreter.process(reading)
         angle = controller.route(offset)
         car.set_steering_angle(angle)
+        time.sleep(0.5)
 
