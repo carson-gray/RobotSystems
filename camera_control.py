@@ -33,11 +33,11 @@ while True:
     resp = urlopen('http://raspberrypi.local:9000/mjpg')
     logging.debug(resp)
     image = np.asarray(bytearray(resp.read()), dtype="uint8")
-    logging.debug(resp)
+    logging.debug(image)
     frame = cv2.imdecode(image, cv2.IMREAD_COLOR)
-    logging.debug(resp)
+    logging.debug(frame)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    logging.debug(resp)
+    logging.debug(hsv)
 
     # blue mask
     lower_blue = np.array([60, 40, 40])
