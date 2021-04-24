@@ -32,6 +32,8 @@ while True:
     # get image
     last = Vilib.img_array[0]
     cv2.imshow("last", last)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
     # frame = cv2.imread(last)
     # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     #
