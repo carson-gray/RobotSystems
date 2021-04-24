@@ -28,34 +28,20 @@ logging.getLogger().setLevel(logging.DEBUG)
 Vilib.camera_start(True)
 time.sleep(3)
 
-# vcam = cv2.VideoCapture(Vilib.video_source)
-# vcam.set(3, 320)
-# vcam.set(4, 240)
-# width = int(vcam.get(3))
-# height = int(vcam.get(4))
-# vcam.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-# cv2.setUseOptimized(True)
-
 while True:
-    # get the image
-    # resp = urlopen('http://raspberrypi.local:9000/mjpg').read()
-    # _, img = vcam.read()
+    # get image
     last = Vilib.img_array[0]
-    # logging.debug(img)
-    logging.debug(last)
-    # frame = cv2.imdecode(image, cv2.IMREAD_COLOR)
-    # logging.debug(frame)
-    # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    # logging.debug(hsv)
-    #
-    # # blue mask
-    # lower_blue = np.array([60, 40, 40])
-    # upper_blue = np.array([150, 255, 255])
-    # mask = cv2.inRange(hsv, lower_blue, upper_blue)
-    #
-    # # canny
-    # edges = cv2.Canny(mask, 200, 400)
-    # logging.debug(edges)
+    frame = cv2.imread(last)
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # blue mask
+    lower_blue = np.array([60, 40, 40])
+    upper_blue = np.array([150, 255, 255])
+    mask = cv2.inRange(hsv, lower_blue, upper_blue)
+
+    # canny
+    edges = cv2.Canny(mask, 200, 400)
+    logging.debug(edges)
 
     time.sleep(1)
 
