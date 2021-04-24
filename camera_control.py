@@ -24,6 +24,7 @@ logging.basicConfig(format=logging_format, level=logging.INFO,
 logging.getLogger().setLevel(logging.DEBUG)
 
 Vilib.camera_start(True)
+time.sleep(3)
 
 while True:
     frame = cv2.imread(urlopen('http://raspberrypi.local:9000/mjpg'))
