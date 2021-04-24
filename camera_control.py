@@ -31,17 +31,18 @@ time.sleep(3)
 while True:
     # get image
     last = Vilib.img_array[0]
-    frame = cv2.imread(last)
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-    # blue mask
-    lower_blue = np.array([60, 40, 40])
-    upper_blue = np.array([150, 255, 255])
-    mask = cv2.inRange(hsv, lower_blue, upper_blue)
-
-    # canny
-    edges = cv2.Canny(mask, 200, 400)
-    logging.debug(edges)
+    cv2.imshow("last", last)
+    # frame = cv2.imread(last)
+    # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    #
+    # # blue mask
+    # lower_blue = np.array([60, 40, 40])
+    # upper_blue = np.array([150, 255, 255])
+    # mask = cv2.inRange(hsv, lower_blue, upper_blue)
+    #
+    # # canny
+    # edges = cv2.Canny(mask, 200, 400)
+    # logging.debug(edges)
 
     time.sleep(1)
 
