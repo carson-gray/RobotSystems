@@ -30,10 +30,9 @@ time.sleep(3)
 
 while True:
     # get the image
-    resp = urlopen('http://raspberrypi.local:9000/mjpg').read()
-    logging.debug(resp)
-    # image = np.asarray(bytearray(resp.read()), dtype="uint8")
-    # logging.debug(image)
+    # resp = urlopen('http://raspberrypi.local:9000/mjpg').read()
+    last = Vilib.get_frame()
+    logging.debug(last)
     # frame = cv2.imdecode(image, cv2.IMREAD_COLOR)
     # logging.debug(frame)
     # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
