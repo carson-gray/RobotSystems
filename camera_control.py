@@ -5,6 +5,7 @@ sys.path.append(r'/opt/ezblock')
 from vilib import Vilib
 from urllib.request import urlopen
 import cv2
+import numpy as np
 try:
     from ezblock import *
     from ezblock import __reset_mcu__
@@ -27,6 +28,9 @@ Vilib.camera_start(True)
 time.sleep(3)
 
 while True:
-    frame = cv2.imread(urlopen('http://raspberrypi.local:9000/mjpg'))
-    time.sleep(0.25)
+    resp = urlopen('http://raspberrypi.local:9000/mjpg')
+    image = np.asarray(bytearray(resp.read()), dtype="uint8")
+    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    logging.debug(image)
+    time.sleep(1)
 
