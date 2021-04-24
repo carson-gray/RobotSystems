@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 import time
+from vilib import Vilib
+import cv2
 try:
     from ezblock import *
     from ezblock import __reset_mcu__
@@ -12,24 +14,20 @@ except ImportError:
     from sim_ezblock import *
 from picarx_class import PicarX
 import logging
-from logdecorator import log_on_start, log_on_end, log_on_error
 logging_format = "%(asctime)s: %(message)s"
 logging.basicConfig(format=logging_format, level=logging.INFO,
                     datefmt="%H:%M:%S")
 # comment out this line to disable logging
 logging.getLogger().setLevel(logging.DEBUG)
 
-import sys
-sys.path.append(r'/opt/ezblock')
-from vilib import Vilib
+
 
 Vilib.camera_start(True)
-Vilib.color_detect_switch(True)
-Vilib.detect_color_name('red')
+# Vilib.color_detect_switch(True)
+# Vilib.detect_color_name('blue')
 
-def forever():
-  pass
+while True:
+    last = Vilib.front_view_img
+    frame = cv2.imread(last)
+    time.sleep(0.25)
 
-if __name__ == "__main__":
-    while True:
-        forever()
