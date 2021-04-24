@@ -24,17 +24,25 @@ logging.basicConfig(format=logging_format, level=logging.INFO,
 # comment out this line to disable logging
 logging.getLogger().setLevel(logging.DEBUG)
 
+# start streaming
 Vilib.camera_start(True)
 time.sleep(3)
 
 while True:
+    # get the image
     resp = urlopen('http://raspberrypi.local:9000/mjpg')
     image = np.asarray(bytearray(resp.read()), dtype="uint8")
-    logging.debug(image)
+    frame = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    time.sleep(.5)
+    # blue mask
+    lower_blue = np.array([60, 40, 40])
+    upper_blue = np.array([150, 255, 255])
+    mask = cv2.inRange(hsv, lower_blue, upper_blue)
 
-    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    # canny
+    edges = cv2.Canny(mask, 200, 400)
+    logging.debug(edges)
 
     time.sleep(1)
 
