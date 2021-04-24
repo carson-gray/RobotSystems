@@ -30,7 +30,11 @@ time.sleep(3)
 while True:
     resp = urlopen('http://raspberrypi.local:9000/mjpg')
     image = np.asarray(bytearray(resp.read()), dtype="uint8")
-    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
     logging.debug(image)
+
+    time.sleep(.5)
+
+    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+
     time.sleep(1)
 
