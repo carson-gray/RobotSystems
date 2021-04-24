@@ -44,5 +44,11 @@ while True:
     edges = cv2.Canny(mask, 200, 400)
     logging.debug(edges)
 
+    import matplotlib.pyplot as plt
+    import matplotlib.image as mpimg
+    img = mpimg.imread(image)
+    imgplot = plt.imshow(img)
+    plt.show()
+
     time.sleep(1)
 
