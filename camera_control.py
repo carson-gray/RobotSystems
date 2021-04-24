@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 import time
+import sys
+sys.path.append(r'/opt/ezblock')
 from vilib import Vilib
+from urllib.request import urlopen
 import cv2
 try:
     from ezblock import *
@@ -20,14 +23,9 @@ logging.basicConfig(format=logging_format, level=logging.INFO,
 # comment out this line to disable logging
 logging.getLogger().setLevel(logging.DEBUG)
 
-
-
 Vilib.camera_start(True)
-# Vilib.color_detect_switch(True)
-# Vilib.detect_color_name('blue')
 
 while True:
-    last = Vilib.front_view_img
-    frame = cv2.imread(last)
+    frame = cv2.imread(urlopen('http://raspberrypi.local:9000/mjpg'))
     time.sleep(0.25)
 
