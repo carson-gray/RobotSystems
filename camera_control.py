@@ -30,23 +30,23 @@ time.sleep(3)
 
 while True:
     # get the image
-    resp = urlopen('http://raspberrypi.local:9000/mjpg')
+    resp = urlopen('http://raspberrypi.local:9000/mjpg').read()
     logging.debug(resp)
-    image = np.asarray(bytearray(resp.read()), dtype="uint8")
-    logging.debug(image)
-    frame = cv2.imdecode(image, cv2.IMREAD_COLOR)
-    logging.debug(frame)
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    logging.debug(hsv)
-
-    # blue mask
-    lower_blue = np.array([60, 40, 40])
-    upper_blue = np.array([150, 255, 255])
-    mask = cv2.inRange(hsv, lower_blue, upper_blue)
-
-    # canny
-    edges = cv2.Canny(mask, 200, 400)
-    logging.debug(edges)
+    # image = np.asarray(bytearray(resp.read()), dtype="uint8")
+    # logging.debug(image)
+    # frame = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    # logging.debug(frame)
+    # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # logging.debug(hsv)
+    #
+    # # blue mask
+    # lower_blue = np.array([60, 40, 40])
+    # upper_blue = np.array([150, 255, 255])
+    # mask = cv2.inRange(hsv, lower_blue, upper_blue)
+    #
+    # # canny
+    # edges = cv2.Canny(mask, 200, 400)
+    # logging.debug(edges)
 
     time.sleep(1)
 
