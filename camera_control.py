@@ -28,9 +28,6 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 class CameraController:
     def __init__(self):
-        # start streaming
-        Vilib.camera_start(True)
-        time.sleep(3)
         self.lower_blue = np.array([60, 40, 40])
         self.upper_blue = np.array([150, 255, 255])
 
@@ -52,6 +49,10 @@ class CameraController:
 
 
 if __name__ == "main":
+    # start streaming
+    Vilib.camera_start(True)
+    time.sleep(3)
+
     picam = CameraController()
     while True:
         edge = picam.detect_edges()
