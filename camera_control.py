@@ -36,6 +36,9 @@ class CameraController:
         self.lower_blue = np.array([60, 40, 40])
         self.upper_blue = np.array([150, 255, 255])
 
+        # changes later
+        self.height, self.width = 100, 100
+
         atexit.register(self.cleanup)
 
     def cleanup(self):
@@ -96,7 +99,7 @@ class CameraController:
 
         boundary = 1/3
         left_region_boundary = width * (1 - boundary)  # left lane line segment should be on left 2/3 of the screen
-        right_region_boundary = width * boundary # right lane line segment should be on left 2/3 of the screen
+        right_region_boundary = width * boundary  # right lane line segment should be on left 2/3 of the screen
 
         for line_segment in line_segments:
             for x1, y1, x2, y2 in line_segment:
@@ -126,27 +129,44 @@ class CameraController:
         return lane_lines
 
     def make_points(self, frame, line):
-        height, width, _ = frame.shape
+        self.height, self.width, _ = frame.shape
         slope, intercept = line
-        y1 = height  # bottom of the frame
+        y1 = self.height  # bottom of the frame
         y2 = int(y1 * 1 / 2)  # make points from middle of the frame down
 
         # bound the coordinates within the frame
-        x1 = max(-width, min(2 * width, int((y1 - intercept) / slope)))
-        x2 = max(-width, min(2 * width, int((y2 - intercept) / slope)))
+        x1 = max(-self.width, min(2 * self.width, int((y1 - intercept) / slope)))
+        x2 = max(-self.width, min(2 * self.width, int((y2 - intercept) / slope)))
         return [[x1, y1, x2, y2]]
 
-    def detect_lane(self):
+    def heading(self, lanes):
+        _, _, left_x2, _ = lanes[0][0]
+        _, _, right_x2, _ = lanes[1][0]
+        mid = int(self.width / 2)
+        x_offset = (left_x2 + right_x2) / 2 - mid
+        y_offset = int(self.height / 2)
+
+        angle_to_mid_radian = math.atan(x_offset / y_offset)  # angle (in radian) to center vertical line
+        angle_to_mid_deg = int(angle_to_mid_radian * 180.0 / math.pi)  # angle (in degrees) to center vertical line
+        steering_angle = angle_to_mid_deg + 90  # this is the steering angle needed by picar front wheel
+
+        return steering_angle
+
+    def navigate(self):
         frame = self.get_frame()
         edges = self.detect_edges(frame)
         cropped_edges = self.region_of_interest(edges)
         line_segments = self.detect_line_segments(cropped_edges)
         lane_lines = self.average_slope_intercept(frame, line_segments)
-        return lane_lines
+        angle = self.heading(lane_lines)
+        return angle
 
 
 if __name__ == "main":
     picam = CameraController()
+    picar = PicarX()
+    picar.set_steering_angle(0.0)
+
     while True:
-        lanes = picam.detect_lane()
+        picar.drive(25.0, picam.navigate(), .3)
         time.sleep(1)
