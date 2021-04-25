@@ -4,7 +4,6 @@ import sys
 import atexit
 sys.path.append(r'/opt/ezblock')
 from vilib import Vilib
-from urllib.request import urlopen
 import cv2
 import numpy as np
 try:
