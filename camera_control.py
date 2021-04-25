@@ -167,5 +167,4 @@ if __name__ == "main":
     picar.set_steering_angle(0.0)
 
     while True:
-        picar.drive(25.0, picam.navigate(), .3)
-        time.sleep(1)
+        picar.drive(25.0, picam.navigate(), 0.5)
