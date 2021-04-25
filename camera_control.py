@@ -31,10 +31,10 @@ class CameraController:
         # start streaming
         Vilib.camera_start(True)
         time.sleep(3)
-        atexit.register(self.cleanup)
-
         self.lower_blue = np.array([60, 40, 40])
         self.upper_blue = np.array([150, 255, 255])
+
+        atexit.register(self.cleanup)
 
     def cleanup(self):
         Vilib.camera_start(False)
@@ -54,5 +54,6 @@ class CameraController:
 if __name__ == "main":
     picam = CameraController()
     while True:
-        logging.debug(picam.detect_edges())
+        edge = picam.detect_edges()
+        logging.debug(edge)
         time.sleep(1)
