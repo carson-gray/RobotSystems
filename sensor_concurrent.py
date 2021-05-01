@@ -169,9 +169,9 @@ def main():
     interpreter_bus = Bus()
 
     # delay timers
-    sensor_delay = 1
-    interpreter_delay = 2
-    controller_delay = 1
+    sensor_delay = .1
+    interpreter_delay = .1
+    controller_delay = .1
 
     # run concurrently
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
